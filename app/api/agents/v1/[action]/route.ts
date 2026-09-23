@@ -11,7 +11,7 @@ import {
 } from "@/lib/stellar";
 import { publishReasoning } from "@/lib/reasoning/publish";
 import {
-  AGENT_API_ACTIONS, AGENT_API_VERSION, MAX_SIGNED_REQUEST_PAYLOAD_BYTES,
+  AGENT_ACTION_PAUSE, AGENT_API_ACTIONS, AGENT_API_VERSION, MAX_SIGNED_REQUEST_PAYLOAD_BYTES,
   agentRequestMessage, validateAgentRequestEnvelope,
   type AgentApiAction, type SignedAgentRequest,
 } from "@/lib/agents/api";
@@ -310,6 +310,15 @@ export async function POST(req: Request, context: { params: Promise<{ action: st
         detail: "dryRun and proposeMarket work meanwhile; they move no money.",
       },
     }, 403);
+  }
+  // After the feature check, as in checkWriteAllowed: "not enabled" is the truer
+  // answer for something that was never switched on. Before the idempotency replay,
+  // so a cached "allowed" cannot be served while the capability is paused.
+  const pauseCapability = AGENT_ACTION_PAUSE[action];
+  const pauseErr = pauseCapability ? gateOrPause({ capability: pauseCapability }) : null;
+  if (pauseErr) {
+    await audit(request, "rejected", "paused");
+    return errorResponse(pauseErr);
   }
   const prior = await loadIdempotentResponse(agent.agentId, action, request.idempotencyKey);
   if (prior) return json(prior.body, prior.status);
