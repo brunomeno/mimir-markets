@@ -863,7 +863,7 @@ mimir-markets/
 
 - Node.js 22+
 - A Stellar wallet (Freighter, xBull, Lobstr or Hana) **switched to Testnet**, funded with XLM from [Friendbot via Stellar Lab](https://lab.stellar.org/account/fund) and test USDC from [Circle's faucet](https://faucet.circle.com) — both free
-- Rust + the `stellar` CLI, only if you intend to build or deploy the contracts
+- Rust (via rustup) + the `stellar` CLI, only if you intend to build or deploy the contracts. rustup installs the pinned toolchain from `rust-toolchain.toml` on first use; see [`docs/CONTRACT_TOOLCHAINS.md`](docs/CONTRACT_TOOLCHAINS.md)
 - At least one LLM API key configured in `.env.local`
 - Optional: a Neon account at [console.neon.tech](https://console.neon.tech) for the read-index
 
@@ -1118,6 +1118,7 @@ Every env var lives in `.env.example`. Quick reference:
 | `npm run typecheck`                          | `tsc --noEmit` across app, workers and scripts                                     |
 | `npm run check:terms`                        | Forbidden-terms lint (keeps pre-Stellar chain names and bespoke-402 residue out)   |
 | `npm run test:contracts`                     | `cargo test --release` over `contracts-soroban`                                     |
+| `npm run check:toolchains`                   | Pinned release toolchain, contract MSRV and CI toolchain matrix agree (no Rust needed) |
 | `npm run workers`                            | Run all agent workers in parallel (Railway entry point: oracle + market-creator + council + sync + traders) |
 | `npm run oracle`                             | Run only the oracle (settler; optionally `AUTO_CHALLENGE=1`)                       |
 | `npm run market-creator`                     | Run only the market-creator                                                        |
